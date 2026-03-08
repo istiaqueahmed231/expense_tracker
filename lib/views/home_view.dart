@@ -18,23 +18,26 @@ class _HomeViewState extends State<HomeView> {
   final HomeViewController controller = Get.put(HomeViewController());
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(30),
-      child: Stack(
-        children: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            spacing: 10,
-            children: [
-
-              headerPart(),
-              balanceExpenseBox(),
-              pieChartCategories(),
-              footerPart(),
-            ],
-          ),
-        ],
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.only(top: 50, bottom: 10, left: 8, right: 8),
+        child: Stack(
+          children: [
+            SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                spacing: 10,
+                children: [
+                  headerPart(),
+                  balanceExpenseBox(),
+                  pieChartCategories(),
+                  footerPart(),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
