@@ -1,11 +1,14 @@
 import 'package:expense_tracker/res/themes/app_themes.dart';
+import 'package:expense_tracker/services/local_db_service.dart';
 import 'package:expense_tracker/utils/app_routes/app_routes.dart';
 import 'package:expense_tracker/utils/route_names/route_names.dart';
 import 'package:expense_tracker/views/splash_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Get.putAsync(() => LocalDbService().initDb()); // Initialize DB
   runApp(const ExpenseTrackerApp());
 }
 
