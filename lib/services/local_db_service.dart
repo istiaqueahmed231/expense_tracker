@@ -11,7 +11,7 @@ class LocalDbService extends GetxService {
     return _db!;
   }
 
-  initDb() async {
+  Future<Database> initDb() async {
     String path = join(await getDatabasesPath(), 'expense_tracker.db');
     return await openDatabase(path, version: 1, onCreate: (db, version) async {
       // 1. Categories Table (Auto-increment ID)

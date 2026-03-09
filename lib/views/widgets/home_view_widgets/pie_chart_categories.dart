@@ -1,85 +1,91 @@
-import 'package:expense_tracker/res/colors/app_colors.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import '../../../view_models/controllers/pie_chart_controller.dart';
 
 Widget pieChartCategories() {
-  return SizedBox(
-    height: 200,
-    width: 150,
-    child: PieChart(
-      PieChartData(
-        // Center space configuration
-        centerSpaceRadius: 40,
+  final PieChartController controller = Get.find<PieChartController>();
 
-        // Section spacing
-        sectionsSpace: 2,
-        sections: [
-          // Salary - Largest portion
-          PieChartSectionData(
-            title: 'Salary',
-            value: 40,
-            color: AppColors.brown,
-            radius: 60,
-            titleStyle: TextStyle(
-              fontSize: 8,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
+  return Obx(() {
+    return SizedBox(
+      height: 300,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          PieChart(
+            PieChartData(
+              // Handle Taps
+              pieTouchData: PieTouchData(
+                touchCallback: (FlTouchEvent event, pieTouchResponse) {
+                  if (!event.isInterestedForInteractions ||
+                      pieTouchResponse == null ||
+                      pieTouchResponse.touchedSection == null) {
+                    controller.touchedIndex.value = -1;
+                    return;
+                  }
+                  controller.touchedIndex.value =
+                      pieTouchResponse.touchedSection!.touchedSectionIndex;
+                },
+              ),
+              centerSpaceRadius: 70,
+              sectionsSpace: 4,
+              sections: _buildSections(controller),
             ),
           ),
-
-          // Rent
-          PieChartSectionData(
-            title: 'Rent',
-            value: 25,
-            color: AppColors.blue ?? Colors.blue,
-            radius: 60,
-            titleStyle: TextStyle(
-              fontSize: 8,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-
-          // Groceries
-          PieChartSectionData(
-            title: 'Groceries',
-            value: 15,
-            color: AppColors.green ?? Colors.green,
-            radius: 60,
-            titleStyle: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-
-          // Entertainment
-          PieChartSectionData(
-            title: 'Entertainment',
-            value: 10,
-            color: AppColors.orange ?? Colors.orange,
-            radius: 60,
-            titleStyle: TextStyle(
-              fontSize: 5,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-
-          // Savings
-          PieChartSectionData(
-            title: 'Savings',
-            value: 10,
-            color: AppColors.purple ?? Colors.purple,
-            radius: 60,
-            titleStyle: TextStyle(
-              fontSize: 6,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
+          // Center text adapts when a section is touched
+          _buildCenterText(controller),
         ],
       ),
-    ),
-  );
+    );
+  });
+}
+
+List<PieChartSectionData> _buildSections(PieChartController controller) {
+  return List.generate(controller.categoryData.length, (i) {
+    final isTouched = i == controller.touchedIndex.value;
+    final data = controller.categoryData[i];
+
+    // Calculate percentage
+    final double percentage = (data['value'] / controller.totalAmount) * 100;
+
+    return PieChartSectionData(
+      color: data['color'],
+      value: data['value'],
+      // Only show title/details on the part that is bigger
+      title: isTouched
+          ? '${data['title']}\n${percentage.toStringAsFixed(1)}%'
+          : '',
+      radius: isTouched ? 35 : 25, // Section gets bigger on tap
+      titleStyle: const TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.bold,
+        color: Colors.white,
+      ),
+    );
+  });
+}
+
+Widget _buildCenterText(PieChartController controller) {
+  return Obx(() {
+    // If a section is touched, show that section's amount, otherwise show total
+    bool hasTouch = controller.touchedIndex.value != -1;
+    String amount = hasTouch
+        ? controller.categoryData[controller.touchedIndex.value]['value'].toString()
+        : controller.totalAmount.toStringAsFixed(0);
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          "BDT $amount",
+          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+        Text(
+          hasTouch ? "Selected Category" : "Total Expense",
+          style: const TextStyle(color: Colors.white70, fontSize: 12),
+        ),
+      ],
+    );
+  });
 }

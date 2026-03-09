@@ -1,6 +1,7 @@
+import 'package:expense_tracker/res/colors/app_colors.dart';
 import 'package:expense_tracker/view_models/controllers/home_view_controller.dart';
+import 'package:expense_tracker/views/widgets/home_view_widgets/add_panel.dart';
 import 'package:expense_tracker/views/widgets/home_view_widgets/balance_expense.dart';
-import 'package:expense_tracker/views/widgets/home_view_widgets/footer_part.dart';
 import 'package:expense_tracker/views/widgets/home_view_widgets/header_part.dart';
 import 'package:expense_tracker/views/widgets/home_view_widgets/pie_chart_categories.dart';
 import 'package:flutter/material.dart';
@@ -31,14 +32,33 @@ class _HomeViewState extends State<HomeView> {
                 children: [
                   headerPart(),
                   balanceExpenseBox(),
+                  SizedBox(height: 50),
                   pieChartCategories(),
-                  footerPart(),
+                  // footerPart(),
                 ],
               ),
             ),
           ],
         ),
       ),
+      floatingActionButton: addButton(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+    );
+  }
+
+  Widget? addButton() {
+    return FloatingActionButton(
+      onPressed: () {
+        showModalBottomSheet(
+          context: context,
+          builder: (BuildContext context) {
+           return addPanel();
+          },
+        );
+        //add_panel();
+        //Get.to(addPanel(context));
+      },
+      child: Icon(Icons.add, size: 50, color: AppColors.yellow),
     );
   }
 }
